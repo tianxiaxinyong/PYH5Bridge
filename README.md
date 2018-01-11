@@ -7,18 +7,38 @@
 
 
 ##### 集成说明
-PYH5Bridge提供源码及framework这2种集成方式，可任意选择一种进行集成。
-###### 1、Pod安装
+PYH5Bridge提供源码手动集成及Pod安装这2种集成方式，可任意选择一种进行集成。
+###### Pod安装
 ```objc
 	pod 'PYH5Bridge'
 ```  
 
-###### 2、手动集成
+###### 手动集成
 1）将`PYH5Bridge/PYH5Bridge/Classes`目录下的所有文件先复制到项目路径下，然后在Xcode中通过"`Add Files to project`"的方式添加。  
-2）在项目`Build Phases`的`Link Binary With Libraries`中添加`AVFoundation.framework`、`AssetsLibrary.framework`、`libz.tbd`、`libresolv.9.tbd`、`JavaScriptCore.framework`、SystemConfiguration.framework、Photos.framework、MobileCoreServices.framework、CoreMedia.framework框架。  
-3）info.plist中添加"Privacy - Camera Usage Description"项，`Type`为String，`Value`为申请相机权限时的提示文字。  
-4）info.plist中添加"LSApplicationQueriesSchemes"项，`Type`为Array，增加一个子项, `Key`可以自由命名，`Type`为String，`Value`为"weixin"。  
-5）由鹏元征信后台为用户生成一个`URL scheme`标识, 在项目工程里面的info选项里面的URL Type里添加一项，`URL scheme`为鹏元征信后台生成的标识，添加以后可以在Safari里面输入添加的"URL scheme://"，看是否能跳转到自己的应用。
+
+2）在项目"`Build Phases`"的"`Link Binary With Libraries`"中添加如下框架：  
+1.`AVFoundation.framework`  
+2.`AssetsLibrary.framework`  
+3.`libz.tbd`  
+4.`libresolv.9.tbd`  
+5.`JavaScriptCore.framework`  
+6.`SystemConfiguration.framework`  
+7.`Photos.framework`  
+8.`MobileCoreServices.framework`  
+9.`CoreMedia.framework`  
+
+3）`PYH5Bridge`还依赖如下第三方组件，请手动添加到项目中(点击链接可直达github处下载)：  
+1.[`AFNetworking`](https://github.com/AFNetworking/AFNetworking)  
+2.[`MBProgressHUD`](https://github.com/jdg/MBProgressHUD)  
+3.[`Qiniu`](https://github.com/qiniu/objc-sdk)  
+4.[`HappyDNS`](https://github.com/qiniu/happy-dns-objc)  
+5.[`IMYWebView`](https://github.com/li6185377/IMYWebView)  
+  
+
+###### 额外设置
+1）由于iOS 11的权限策略变更，需要在info.plist中添加"Privacy - Camera Usage Description"项，`Type`为String，`Value`为申请相机权限时的提示文字。  
+2）info.plist中添加"LSApplicationQueriesSchemes"项，`Type`为Array，增加一个子项, `Key`可以自由命名，`Type`为String，`Value`为"weixin"。  
+3）由我们为用户生成一个`URL scheme`标识, 在项目工程里面的info选项里面的URL Type里添加一项，`URL scheme`为我们后台生成的标识，添加以后在手机上运行一次，然后可以在手机Safari浏览器里面输入刚添加的"URL scheme://"，验证是否能跳转到自己的应用。
 
 
 
@@ -29,7 +49,7 @@ PYH5Bridge提供了WebView的PYCWebViewHelper类，用于设置WebView的JS Brid
 ```objc
 #import "PYCWebViewHelper.h" 
 
-@property (nonatomic, strong) PYCWebViewHelper                                *pycWebViewHelper;  
+@property (nonatomic, strong) PYCWebViewHelper *pycWebViewHelper;  
 
 - (void)viewDidLoad {  
 　　[super viewDidLoad];  
