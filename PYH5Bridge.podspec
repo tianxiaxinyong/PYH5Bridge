@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'PYH5Bridge'
-  s.version          = '0.1.0'
+  s.version          = '0.2.0'
   s.summary          = 'PYH5Bridge.'
 
 # This description is used to generate tags and improve search results.
@@ -24,7 +24,7 @@ Pod::Spec.new do |s|
   s.homepage         = 'https://github.com/tianxiaxinyong/PYH5Bridge'
   # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
   s.license          = { :type => 'Apache', :file => 'LICENSE' }
-  s.author           = { 'lijun' => 'ios1@pycredit.cn' }
+  s.author           = { 'tianxiaxinyong' => 'ios1@pycredit.cn' }
   s.source           = { :git => 'https://github.com/tianxiaxinyong/PYH5Bridge.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 

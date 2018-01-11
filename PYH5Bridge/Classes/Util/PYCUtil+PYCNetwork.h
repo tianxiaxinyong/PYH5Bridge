@@ -7,9 +7,6 @@
 //
 
 #import "PYCUtil.h"
-#import "QNUploadOption.h"
-#import "QNUploadManager.h"
-#import "QNResponseInfo.h"
 
 
 typedef void(^PY7NiuFinishBlock)(id result);
