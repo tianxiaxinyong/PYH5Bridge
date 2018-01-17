@@ -1,7 +1,4 @@
 
-
-[ ![Download](https://api.bintray.com/packages/tianxiaxinyong/maven/PYH5Bridge/images/download.svg?version=1.1.0) ](https://bintray.com/tianxiaxinyong/maven/PYH5Bridge/1.1.0/link)
-
 ##  PYH5Bridge集成说明
 
 
