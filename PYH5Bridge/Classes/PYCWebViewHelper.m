@@ -16,10 +16,10 @@
 #import "PYCUtil+PYCFilePath.h"
 #import "PYCUtil+PYCTimeManage.h"
 #import "PYCPostImageFile.h"
-#import "UIView+Toast.h"
+#import "UIView+PYToast.h"
 #import "PYCH5CurrentImagesInfo.h"
 #import "PYCH5IOImageHelper.h"
-#import "JZAlbumViewController.h"
+#import "PYAlbumViewController.h"
 #import "PYCUtil+PYCAppAndServiceInfo.h"
 #import <MobileCoreServices/MobileCoreServices.h>
 #import "PYCUtil+PYCInvocatSystemOperate.h"
@@ -29,6 +29,34 @@
 #import "PYCUtil+PYCNetwork.h"
 #import "PYCJSBaseWebViewModel.h"
 
+static NSString * const kSdkVersion = @"1.1.2";
+
+static NSString * const kPYJSFunc_CameraGetImage    = @"cameraGetImage";
+static NSString * const kPYJSFunc_PreviewImage      = @"previewImage";
+static NSString * const kPYJSFunc_UploadImage       = @"uploadImage";
+static NSString * const kPYJSFunc_OpenPayApp        = @"openPayApp";
+static NSString * const kPYJSFunc_GetAdBannerURL    = @"getAdBannerURL";
+static NSString * const kPYJSFunc_ClickAd           = @"clickAd";
+static NSString * const kPYJSFunc_GetAppInfo        = @"getAppInfo";
+static NSString * const kPYJSFunc_Authorization     = @"authorization";
+
+
+/**
+ 用户请求权限及返回结果
+
+ - UserOpenAuthorizationNoResult: 默认无权限
+ - UserOpenAuthorizationImageResult: 相册权限
+ - UserOpenAuthorizationVideoResult: 相机权限
+ - UserOpenAuthorizationAudioResult:麦克风权限
+ - UserOpenAuthorizationAllResult: 权限集合
+ */
+typedef NS_ENUM(NSUInteger, UserOpenAuthorizationResult) {
+    UserOpenAuthorizationNoResult    = 1 << 0,
+    UserOpenAuthorizationImageResult = 1 << 1,
+    UserOpenAuthorizationVideoResult = 1 << 2,
+    UserOpenAuthorizationAudioResult = 1 << 3,
+//    UserOpenAuthorizationAllResult   = 1 << 8,
+};
 @interface PYCWebViewHelper ()<PYCH5IOImageHelperProtocol,WKNavigationDelegate,UIWebViewDelegate,PYCJSObjectProtocol>
 
 @property (nonatomic, copy) NSArray *jsActionNameArr;
@@ -37,6 +65,15 @@
 @property (nonatomic, readonly) id realWebView;
 ///是否正在使用 UIWebView
 @property (nonatomic, readonly) BOOL                  usingUIWebView;
+
+/**
+ 从设置中返回，用于检测权限是否打开
+ */
+@property (nonatomic, assign) BOOL                   isCheckingAuthorization;
+/**
+ 从设置中返回，用于检测权限是否打开
+ */
+@property (nonatomic, assign)UserOpenAuthorizationResult userOpenAuthorizationResult;
 @property (nonatomic,strong) JSContext                *context;
 @property (nonatomic,strong)  PYCH5CurrentImagesInfo   *h5CurrentImagesInfo;
 @property (nonatomic, strong) PYCH5IOImageHelper       *h5IOImageHelper;
@@ -75,6 +112,8 @@ typedef void(^successOpenPaymentApp)(void);
     if (self = [super init]) {
         _urlString = usrString;
         _webViewHelperBlock = webViewHelperBlock;
+        _isCheckingAuthorization = NO;
+        _userOpenAuthorizationResult = UserOpenAuthorizationNoResult;
     }
     return self;
 }
@@ -83,8 +122,17 @@ typedef void(^successOpenPaymentApp)(void);
  
  @param webView webView description
  */
-- (void)addScriptMessageHandlerToWebView:(id)webView webViewDelegate:(id)scriptMessageHandler
+- (void)addScriptMessageHandlerToWebView:(UIView *)webView webViewDelegate:(UIViewController *)scriptMessageHandler
 {
+    if (webView == nil) {
+        NSAssert(NO, @"webView 参数不能为nil!");
+        return;
+    }
+    if (![scriptMessageHandler isKindOfClass:[UIViewController class]]) {
+        NSAssert(NO, @"webViewDelegate 参数类型错误!");
+        return;
+    }
+    
     _realWebView = webView;
     if ([webView isKindOfClass:[UIWebView class]]) {
         _usingUIWebView = YES;
@@ -95,6 +143,7 @@ typedef void(^successOpenPaymentApp)(void);
     }
     
     [self setupWebView:webView];
+
     _scriptMessageHandler = scriptMessageHandler;
 }
 /**
@@ -106,7 +155,15 @@ typedef void(^successOpenPaymentApp)(void);
 }
 - (NSArray *)jsActionNameArr {
     if (_jsActionNameArr == nil) {
-         _jsActionNameArr = [[NSArray alloc] initWithObjects:@"cameraGetImage", @"previewImage", @"uploadImage", @"openPayApp",@"getAdBannerURL",@"clickAd", nil];
+         _jsActionNameArr = [[NSArray alloc] initWithObjects:kPYJSFunc_CameraGetImage,
+                             kPYJSFunc_PreviewImage,
+                             kPYJSFunc_UploadImage,
+                             kPYJSFunc_OpenPayApp,
+                             kPYJSFunc_GetAdBannerURL,
+                             kPYJSFunc_ClickAd,
+                             kPYJSFunc_GetAppInfo,
+                             kPYJSFunc_Authorization,
+                             nil];
     }
     
     return _jsActionNameArr;
@@ -206,23 +263,30 @@ typedef void(^successOpenPaymentApp)(void);
     
     [self.resultDataDictionary setValue:resultData forKey:resultData.action];
     
-    if ([resultData.action isEqualToString:@"cameraGetImage"]) {
+    if ([resultData.action isEqualToString:kPYJSFunc_CameraGetImage]) {
         [self _actionCameraGetImage:dict];
     }
-    else if ([resultData.action isEqualToString:@"previewImage"]){
+    else if ([resultData.action isEqualToString:kPYJSFunc_PreviewImage]){
         [self _actionPreviewImage:dict];
     }
-    else if ([resultData.action isEqualToString:@"uploadImage"]){
+    else if ([resultData.action isEqualToString:kPYJSFunc_UploadImage]){
         [self _actionUploadImage:dict];
     }
-    else if ([resultData.action isEqualToString:@"openPayApp"]){
+    else if ([resultData.action isEqualToString:kPYJSFunc_OpenPayApp]){
         [self _actionOpenApp:dict];
     }
-    else if ([resultData.action isEqualToString:@"getAdBannerURL"]){//获取广告图片URL
+    else if ([resultData.action isEqualToString:kPYJSFunc_GetAdBannerURL]){//获取广告图片URL
         [self _actiongetAdBannerURL:dict];
     }
-    else if ([resultData.action isEqualToString:@"clickAd"]){//广告点击事件
+    else if ([resultData.action isEqualToString:kPYJSFunc_ClickAd]){//广告点击事件
         [self _actionclickAd:dict];
+    }
+    else if ([resultData.action isEqualToString:kPYJSFunc_GetAppInfo]) {
+        [self actionGetAppInfo:dict];
+    }
+    else if ([resultData.action isEqualToString:kPYJSFunc_Authorization])//是否有视频权限和写入像册权限
+    {
+        [self actionAuthorization:dict];
     }
 }
 #pragma mark - UIWebViewDelegate
@@ -321,7 +385,7 @@ typedef void(^successOpenPaymentApp)(void);
 ///uploadImageData to JS
 - (void)_uploadImageData:(NSString *)imageData withPath:(NSString *)path
 {
-    NSString *jsStr = [NSString stringWithFormat:@"%@({\"base64\":\"%@\", \"localId\":\"%@\"})", self.resultDataDictionary[@"cameraGetImage"].successFunName, imageData, path];
+    NSString *jsStr = [NSString stringWithFormat:@"%@({\"base64\":\"%@\", \"localId\":\"%@\"})", self.resultDataDictionary[kPYJSFunc_CameraGetImage].successFunName, imageData, path];
     
     [self executeJSFunctionWithString:jsStr];
 }
@@ -349,21 +413,21 @@ typedef void(^successOpenPaymentApp)(void);
                       cancelClick:(BOOL)clickCancel
 {
     if (clickCancel) {
-        NSString *jsString = [NSString stringWithFormat:@"%@({\"code\":\"error_1002\", \"message\":\"用户取消拍照\"})", self.resultDataDictionary[@"cameraGetImage"].errorFunName];
+        NSString *jsString = [NSString stringWithFormat:@"%@({\"code\":\"error_1002\", \"message\":\"用户取消拍照\"})", self.resultDataDictionary[kPYJSFunc_CameraGetImage].errorFunName];
         [self executeJSFunctionWithString:jsString];
         
         return;
     }
     //权限不足
     if (hasAuthority == NO) {
-        NSString *jsString = [NSString stringWithFormat:@"%@({\"code\":\"error_1001\", \"message\":\"拍照权限不足，请检查\"})", self.resultDataDictionary[@"cameraGetImage"].errorFunName];
+        NSString *jsString = [NSString stringWithFormat:@"%@({\"code\":\"error_1001\", \"message\":\"拍照权限不足，请检查\"})", self.resultDataDictionary[kPYJSFunc_CameraGetImage].errorFunName];
         [self executeJSFunctionWithString:jsString];
         return;
     }
     
     //取消拍照
     if (images.count == 0) {
-        NSString *jsString = [NSString stringWithFormat:@"%@({\"code\":\"error_1002\", \"message\":\"用户取消拍照\"})", self.resultDataDictionary[@"cameraGetImage"].errorFunName];
+        NSString *jsString = [NSString stringWithFormat:@"%@({\"code\":\"error_1002\", \"message\":\"用户取消拍照\"})", self.resultDataDictionary[kPYJSFunc_CameraGetImage].errorFunName];
         [self executeJSFunctionWithString:jsString];
         
         return;
@@ -372,7 +436,7 @@ typedef void(^successOpenPaymentApp)(void);
     //todo: 生成缩略图
     PYCPostImageFile *imageFile = images[0];
     UIImage *image = [UIImage imageWithContentsOfFile:imageFile.imgFilePath];
-    PYCJSResultData *jsResultData = (PYCJSResultData *)self.resultDataDictionary[@"cameraGetImage"];
+    PYCJSResultData *jsResultData = (PYCJSResultData *)self.resultDataDictionary[kPYJSFunc_CameraGetImage];
     NSString *width = jsResultData.data[@"thumbWidth"];
     if (width == nil) {
         width = @"0";
@@ -403,14 +467,14 @@ typedef void(^successOpenPaymentApp)(void);
             break;
     }
 }
-#pragma mark - actionFuns
+#pragma mark - actionFuns Start
 
 - (void) _actionPreviewImage:(NSDictionary *)dict
 {
     NSMutableArray *imgArr = @[].mutableCopy;
     NSDictionary *data = dict[@"args"][@"data"];
     if (data == nil) {
-        NSString *jsString = [NSString stringWithFormat:@"%@({\"code\":\"error_4001\", \"message\":\"paramter invalid\"})", self.resultDataDictionary[@"previewImage"].errorFunName];
+        NSString *jsString = [NSString stringWithFormat:@"%@({\"code\":\"error_4001\", \"message\":\"paramter invalid\"})", self.resultDataDictionary[kPYJSFunc_PreviewImage].errorFunName];
         [self executeJSFunctionWithString:jsString];
         return;
     }
@@ -422,18 +486,18 @@ typedef void(^successOpenPaymentApp)(void);
     
     if (imgArr.count == 0)
     {
-        NSString *jsString = [NSString stringWithFormat:@"%@({\"code\":\"error_4001\", \"message\":\"not found\"})", self.resultDataDictionary[@"previewImage"].errorFunName];
+        NSString *jsString = [NSString stringWithFormat:@"%@({\"code\":\"error_4001\", \"message\":\"not found\"})", self.resultDataDictionary[kPYJSFunc_PreviewImage].errorFunName];
         [self executeJSFunctionWithString:jsString];
         return;
     }
     
-    JZAlbumViewController *vc = [[JZAlbumViewController alloc] init];
+    PYAlbumViewController *vc = [[PYAlbumViewController alloc] init];
     vc.imgArr = imgArr;
     
     vc.currentIndex = 0;
     dispatch_async(dispatch_get_main_queue(), ^{
         [_scriptMessageHandler presentViewController:vc animated:YES completion:^{
-            NSString *jsString = [NSString stringWithFormat:@"%@()", self.resultDataDictionary[@"previewImage"].successFunName];
+            NSString *jsString = [NSString stringWithFormat:@"%@()", self.resultDataDictionary[kPYJSFunc_PreviewImage].successFunName];
             [self executeJSFunctionWithString:jsString];
         }];
     });
@@ -443,7 +507,7 @@ typedef void(^successOpenPaymentApp)(void);
 {
     NSDictionary *data = dict[@"args"][@"data"];
     if (data == nil) {
-        NSString *jsString = [NSString stringWithFormat:@"%@({\"code\":\"error_2001\", \"message\":\"paramter invalid\"})", self.resultDataDictionary[@"uploadImage"].errorFunName];
+        NSString *jsString = [NSString stringWithFormat:@"%@({\"code\":\"error_2001\", \"message\":\"paramter invalid\"})", self.resultDataDictionary[kPYJSFunc_UploadImage].errorFunName];
         [self executeJSFunctionWithString:jsString];
         return;
     }
@@ -478,11 +542,11 @@ typedef void(^successOpenPaymentApp)(void);
         NSError *error;
         NSData *jsonData = [NSJSONSerialization dataWithJSONObject:result options:NSJSONWritingPrettyPrinted error:&error];
         NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-        NSString *jsString = [NSString stringWithFormat:@"%@(%@)", self.resultDataDictionary[@"uploadImage"].successFunName, jsonString];
+        NSString *jsString = [NSString stringWithFormat:@"%@(%@)", self.resultDataDictionary[kPYJSFunc_UploadImage].successFunName, jsonString];
         [self executeJSFunctionWithString:jsString];
     } failedBlock:^(id result) {
 //        NSError *error = (NSError *)result;
-        NSString *jsString = [NSString stringWithFormat:@"%@({\"code\":\"error_2001\", \"message\":\"%@\"})", self.resultDataDictionary[@"uploadImage"].errorFunName, @"网络错误，上传失败"];
+        NSString *jsString = [NSString stringWithFormat:@"%@({\"code\":\"error_2001\", \"message\":\"%@\"})", self.resultDataDictionary[kPYJSFunc_UploadImage].errorFunName, @"网络错误，上传失败"];
         [self executeJSFunctionWithString:jsString];
     }];
 }
@@ -534,6 +598,7 @@ typedef void(^successOpenPaymentApp)(void);
     }
     
     dispatch_async(dispatch_get_main_queue(), ^{
+        self.h5IOImageHelper.imageType = [[[dict objectForKey:@"args"] objectForKey:@"data"] objectForKey:@"imageType"];
         [self.h5IOImageHelper showSelectImageActionSheetWithSelectMaxSum:1
                                                         maxPixelSize:0
                                                             needTrim:NO
@@ -550,11 +615,11 @@ typedef void(^successOpenPaymentApp)(void);
 {
     NSString *jsString = nil;
     if (_urlString.length > 0) {
-        jsString = [NSString stringWithFormat:@"%@({\"url\":\"%@\"})", self.resultDataDictionary[@"getAdBannerURL"].successFunName, _urlString];
+        jsString = [NSString stringWithFormat:@"%@({\"url\":\"%@\"})", self.resultDataDictionary[kPYJSFunc_GetAdBannerURL].successFunName, _urlString];
     }
     else
     {
-        jsString = [NSString stringWithFormat:@"%@({\"code\":\"error_5001\", \"message\":\"没有广告 banner\"})", self.resultDataDictionary[@"getAdBannerURL"].errorFunName];
+        jsString = [NSString stringWithFormat:@"%@({\"code\":\"error_5001\", \"message\":\"没有广告 banner\"})", self.resultDataDictionary[kPYJSFunc_GetAdBannerURL].errorFunName];
     }
 
     [self executeJSFunctionWithString:jsString];
@@ -568,14 +633,14 @@ typedef void(^successOpenPaymentApp)(void);
 {
     NSDictionary *data = dict[@"args"][@"data"];
     if (data == nil) {
-        NSString *jsString = [NSString stringWithFormat:@"%@({\"code\":\"error_6001\", \"message\":\"没有广告\"})", self.resultDataDictionary[@"clickAd"].errorFunName];
+        NSString *jsString = [NSString stringWithFormat:@"%@({\"code\":\"error_6001\", \"message\":\"没有广告\"})", self.resultDataDictionary[kPYJSFunc_ClickAd].errorFunName];
         [self executeJSFunctionWithString:jsString];
         return;
     }
     NSString *tempString = data[@"url"];
     if (tempString.length == 0)
     {
-        NSString *jsString = [NSString stringWithFormat:@"%@({\"code\":\"error_6001\", \"message\":\"没有广告\"})", self.resultDataDictionary[@"clickAd"].errorFunName];
+        NSString *jsString = [NSString stringWithFormat:@"%@({\"code\":\"error_6001\", \"message\":\"没有广告\"})", self.resultDataDictionary[kPYJSFunc_ClickAd].errorFunName];
         [self executeJSFunctionWithString:jsString];
         return;
     }
@@ -586,6 +651,121 @@ typedef void(^successOpenPaymentApp)(void);
     }
     
 }
+
+- (void)actionGetAppInfo:(NSDictionary *)dict {
+    NSString *jsString = nil;
+    jsString = [NSString stringWithFormat:@"%@({\"version\":\"%@\"})", self.resultDataDictionary[kPYJSFunc_GetAppInfo].successFunName, kSdkVersion];
+    
+    [self executeJSFunctionWithString:jsString];
+}
+
+/**
+ 检查权限
+
+ @param dict <#dict description#>
+ */
+- (void)actionAuthorization:(NSDictionary *)dict {
+    NSDictionary *data = dict[@"args"][@"data"];
+    NSNumber *hasCameraRightsNumber = data[@"image"];//是否有照相权限
+    NSNumber *hasCameraAndAudioRightsNumber = data[@"video"];//是否有麦克风权限&照相权限
+    NSString *messageString = nil;
+    BOOL bNeedSetting = NO;
+    BOOL isFirstSetting = NO;//用于第一次设置时，用户点取消，不用再弹出去设置界面
+    _userOpenAuthorizationResult = UserOpenAuthorizationNoResult;
+    _isCheckingAuthorization = NO;
+    if (data == nil) {
+        NSString *jsString = [NSString stringWithFormat:@"%@({\"code\":\"error_8001\", \"message\":\"授权失败\"})", self.resultDataDictionary[kPYJSFunc_Authorization].errorFunName];
+        [self executeJSFunctionWithString:jsString];
+        return;
+    }
+    
+    if (hasCameraRightsNumber != nil && hasCameraRightsNumber.boolValue == YES)
+    {
+        if (![PYCUtil hasCameraRights:&isFirstSetting]) {
+            if (isFirstSetting) {
+                //点击按钮的响应事件；
+                NSString *jsString = [NSString stringWithFormat:@"%@({\"code\":\"error_8001\", \"message\":\"授权失败\"})", self.resultDataDictionary[kPYJSFunc_Authorization].errorFunName];
+                [self executeJSFunctionWithString:jsString];
+                return;
+            }
+            else
+            {
+                bNeedSetting = YES;
+                messageString = @"请在设备的“设置”选项中，允许应用访问您的相机";
+                _userOpenAuthorizationResult |= UserOpenAuthorizationVideoResult;
+            }
+            
+        }
+        
+    }
+    else if (hasCameraAndAudioRightsNumber != nil && hasCameraAndAudioRightsNumber.boolValue == YES)
+    {
+        //要相机及麦克风权限
+        if (![PYCUtil hasCameraRights:&isFirstSetting]) {
+            if (isFirstSetting) {
+                //点击按钮的响应事件；
+                NSString *jsString = [NSString stringWithFormat:@"%@({\"code\":\"error_8001\", \"message\":\"授权失败\"})", self.resultDataDictionary[kPYJSFunc_Authorization].errorFunName];
+                [self executeJSFunctionWithString:jsString];
+                return;
+            }
+            else
+            {
+                bNeedSetting = YES;
+                messageString = @"请在设备的“设置”选项中，允许应用访问您的相机和麦克风";
+                _userOpenAuthorizationResult |= UserOpenAuthorizationVideoResult;
+            }
+            
+        }
+        
+        
+        if (!bNeedSetting && ![PYCUtil hasAudioRights:&isFirstSetting] && !isFirstSetting) {
+            if (isFirstSetting) {
+                //点击按钮的响应事件；
+                NSString *jsString = [NSString stringWithFormat:@"%@({\"code\":\"error_8001\", \"message\":\"授权失败\"})", self.resultDataDictionary[kPYJSFunc_Authorization].errorFunName];
+                [self executeJSFunctionWithString:jsString];
+                return;
+            }
+            else
+            {
+                bNeedSetting = YES;
+                messageString = @"请在设备的“设置”选项中，允许应用访问您的相机和麦克风";
+                _userOpenAuthorizationResult |= UserOpenAuthorizationAudioResult;
+            }
+            
+        }
+        
+    }
+    
+    if (bNeedSetting) {//如果没有权限，则要求用户跳转到设备中打开权限
+        
+        //点击按钮的响应事件；
+        NSString *jsString = [NSString stringWithFormat:@"%@({\"code\":\"error_8001\", \"message\":\"授权失败\"})", self.resultDataDictionary[kPYJSFunc_Authorization].errorFunName];
+        [self executeJSFunctionWithString:jsString];
+        
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:messageString preferredStyle:  UIAlertControllerStyleAlert];
+        
+        [alert addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            
+        }]];
+        
+        [alert addAction:[UIAlertAction actionWithTitle:@"去设置" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            //点击按钮的响应事件；
+            [PYCUtil openSystemSettingOfApp];
+            _isCheckingAuthorization = YES;
+        }]];
+        //弹出提示框；
+        [self.showHUDParentViewController presentViewController:alert animated:true completion:nil];
+    }
+    else
+    {
+        //回调给用户
+        NSString *jsString = [NSString stringWithFormat:@"%@()", self.resultDataDictionary[kPYJSFunc_Authorization].successFunName];
+        [self executeJSFunctionWithString:jsString];
+    }
+}
+
+#pragma mark actionFuns End.
+
 /**
  APP将数据传给JS
  
@@ -613,7 +793,7 @@ typedef void(^successOpenPaymentApp)(void);
  用户要调用的方法
 
  @param webView <#webView description#>
- @param request <#request description#>
+ @param request 集成
  @param navigationType <#navigationType description#>
  @return <#return value description#>
  */
@@ -623,9 +803,7 @@ typedef void(^successOpenPaymentApp)(void);
     if (self.requestBlock) {
         self.requestBlock(request);
     }
-    if ( ( [[requestURL scheme]isEqualToString:@"http" ] ||
-          [[requestURL scheme]isEqualToString:@"https"] ||
-          [[requestURL scheme] isEqualToString: @"mailto" ]) &&
+    if ( ( [[requestURL scheme] isEqualToString: @"mailto" ]) &&
         ( navigationType == UIWebViewNavigationTypeLinkClicked ) )
     {
         return ![[UIApplication sharedApplication] openURL:requestURL];
@@ -671,6 +849,10 @@ typedef void(^successOpenPaymentApp)(void);
 {
     ((UIView *)_realWebView).userInteractionEnabled = userInteractionEnabled.boolValue;
 }
+
+
+#pragma mark WKNavigationDelegate
+
 /**
  用户要调用的方法
 
@@ -735,4 +917,11 @@ typedef void(^successOpenPaymentApp)(void);
     }
     return nil;
 }
+
+
+- (void)pyWebViewWebContentProcessDidTerminate:(WKWebView *)webView
+{
+    [webView reload];
+}
+
 @end

@@ -6,7 +6,7 @@
 //
 
 
-#import "UIView+Toast.h"
+#import "UIView+PYToast.h"
 #import <QuartzCore/QuartzCore.h>
 #import <objc/runtime.h>
 #import <UIKit/UIKit.h>
@@ -57,11 +57,12 @@ static const NSString * CSToastActivityViewKey  = @"CSToastActivityViewKey";
 static const NSString * CSToastTapCallbackKey   = @"CSToastTapCallbackKey";
 
 // positions
-NSString * const CSToastPositionTop                 = @"top";
-NSString * const CSToastPositionBlowStatusBar       = @"BlowStatusBar";
-NSString * const CSToastPositionBlowNavigationBar   = @"BlowNavigationBar";
-NSString * const CSToastPositionCenter              = @"center";
-NSString * const CSToastPositionBottom              = @"bottom";
+NSString * const PYToastPositionTop                 = @"top";
+NSString * const PYToastPositionBlowStatusBar       = @"BlowStatusBar";
+NSString * const PYToastPositionBlowNavigationBar   = @"BlowNavigationBar";
+NSString * const PYToastPositionCenter              = @"center";
+NSString * const PYToastPositionBottom              = @"bottom";
+
 @interface UIView (ToastPrivate)
 
 - (void)hideToast:(UIView *)toast;
@@ -74,13 +75,13 @@ NSString * const CSToastPositionBottom              = @"bottom";
 @end
 
 
-@implementation UIView (Toast)
+@implementation UIView (PYToast)
 
 #pragma mark - Toast Methods
 
 - (void)pymakeToast:(NSString *)message {
     //    [self pymakeToast:message duration:CSToastDefaultDuration position:CSToastPositionCenter];
-    [self pymakeToast:message duration:CSToastDefaultDuration position:CSToastPositionCenter image:[UIImage imageNamed:@"PYLibrary.bundle/toastIcon"]];
+    [self pymakeToast:message duration:CSToastDefaultDuration position:PYToastPositionCenter image:[UIImage imageNamed:@"PYLibrary.bundle/toastIcon"]];
 }
 - (void)pymakeNormalToast:(NSString *)message
 {
@@ -255,19 +256,19 @@ NSString * const CSToastPositionBottom              = @"bottom";
 
 - (CGPoint)centerPointForPosition:(id)point withToast:(UIView *)toast {
     if([point isKindOfClass:[NSString class]]) {
-        if([point caseInsensitiveCompare:CSToastPositionTop] == NSOrderedSame)
+        if([point caseInsensitiveCompare:PYToastPositionTop] == NSOrderedSame)
         {
             return CGPointMake(self.bounds.size.width/2, (toast.frame.size.height / 2));
         }
-        else if([point caseInsensitiveCompare:CSToastPositionCenter] == NSOrderedSame)
+        else if([point caseInsensitiveCompare:PYToastPositionCenter] == NSOrderedSame)
         {
             return CGPointMake(self.bounds.size.width / 2, self.bounds.size.height / 2);
         }
-        else if ([point caseInsensitiveCompare:CSToastPositionBlowStatusBar] == NSOrderedSame)
+        else if ([point caseInsensitiveCompare:PYToastPositionBlowStatusBar] == NSOrderedSame)
         {
             return CGPointMake(self.bounds.size.width / 2, 20 + (toast.frame.size.height / 2));
         }
-        else if ([point caseInsensitiveCompare:CSToastPositionBlowNavigationBar] == NSOrderedSame)
+        else if ([point caseInsensitiveCompare:PYToastPositionBlowNavigationBar] == NSOrderedSame)
         {
             return CGPointMake(self.bounds.size.width / 2, 64 + (toast.frame.size.height / 2));
         }

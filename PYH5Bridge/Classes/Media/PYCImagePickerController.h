@@ -8,6 +8,7 @@
 
 
 #import <UIKit/UIKit.h>
+#import "PYCameraLayerView.h"
 
 // 选择类型：相机/拍照
 typedef enum : NSUInteger
@@ -27,8 +28,8 @@ typedef enum : NSUInteger
 // 选择图片取消之后的代理
 - (void)imagePickerChooseCancel;
 
-
-
+//取拍照类型（正，反，手持）
+- (CameraLayerType)layerType;
 @end
 
 @interface PYCImagePickerController : NSObject<UINavigationBarDelegate, UIImagePickerControllerDelegate, UIAlertViewDelegate>
@@ -38,6 +39,7 @@ typedef enum : NSUInteger
 - (void)showWithControlType:(PYCControlType)type
           maxChooseImageNum:(NSInteger)num
        parentViewController:(UIViewController *)controller
+             pickerDelegate:(NSObject *)pickerDelegate
            cameraDeviceType:(UIImagePickerControllerCameraDevice)cameraDeviceType;//摄像头前或后
 
 - (void)showWithControlType:(PYCControlType)type

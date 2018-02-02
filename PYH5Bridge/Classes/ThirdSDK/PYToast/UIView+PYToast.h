@@ -28,13 +28,13 @@
 
 #import <UIKit/UIKit.h>
 
-extern NSString * const CSToastPositionTop;
-extern NSString * const CSToastPositionCenter;
-extern NSString * const CSToastPositionBottom;
-extern NSString * const CSToastPositionBlowStatusBar;
-extern NSString * const CSToastPositionBlowNavigationBar;
+extern NSString * const PYToastPositionTop;
+extern NSString * const PYToastPositionCenter;
+extern NSString * const PYToastPositionBottom;
+extern NSString * const PYToastPositionBlowStatusBar;
+extern NSString * const PYToastPositionBlowNavigationBar;
 
-@interface UIView (Toast)
+@interface UIView (PYToast)
 
 // each pymakeToast method creates a view and displays it as toast
 - (void)pymakeToast:(NSString *)message;

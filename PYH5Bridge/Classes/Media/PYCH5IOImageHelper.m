@@ -13,7 +13,7 @@
 #import "PYCUtil+PYCFilePath.h"
 #import "PYCUtil+PYCTimeManage.h"
 #import <ImageIO/ImageIO.h>
-#import "UIView+Toast.h"
+#import "UIView+PYToast.h"
 #import "PYCUtil+PYCAppAndServiceInfo.h"
 #import "PYCUtil+PYCInvocatSystemOperate.h"
 #import "MBProgressHUD.h"
@@ -124,10 +124,10 @@
     
     void (^takePhotoBlock)(void) = ^{
         
-        _hasAuthority = [PYCUtil hasCameraRights];
+        _hasAuthority = [PYCUtil hasCameraRights:nil];
         if (!_hasAuthority) {
             if ([[UIDevice currentDevice].systemVersion floatValue] >= 8.0) {
-                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:nil message:@"请在设备的“设置”选项中，允许应用访问您的相机" delegate:self cancelButtonTitle:@"确定" otherButtonTitles:@"去设置", nil];
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:nil message:@"请在设备的“设置”选项中，允许应用访问您的相机" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"去设置", nil];
                 alert.tag = 1000;
                 [alert show];
             }
@@ -148,8 +148,8 @@
         [[PYCImagePickerController sharedInstance] showWithControlType:PYCControlTypeTakePhoto
                                                     maxChooseImageNum:1
                                                  parentViewController:parentViewController
+                                                        pickerDelegate:self
                                                      cameraDeviceType:_cameraDeviceType];
-        [PYCImagePickerController sharedInstance].pickerDelegate = self;
     };
     
     if ([_actionType isEqualToString:@"0"]) {
@@ -177,7 +177,21 @@
     }
     
 }
-
+//取拍照类型（正，反，手持）
+- (CameraLayerType)layerType
+{
+    switch (self.imageType.integerValue) {
+        case 0:
+            return CameraLayerType_IdCard;
+            break;
+        case 1:
+            return CameraLayerType_Flag;
+            break;
+        default:
+            break;
+    }
+    return CameraLayerType_Emblem;
+}
 - (void)imagePickerChooseCancel
 {
     [self _convertImagesComplete:YES];

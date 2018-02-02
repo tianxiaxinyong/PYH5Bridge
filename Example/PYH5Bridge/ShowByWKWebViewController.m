@@ -9,6 +9,11 @@
 #import "ShowByWKWebViewController.h"
 #import "PYCWebViewHelper.h"
 
+#define kPYStatusBarHeight                  [[UIApplication sharedApplication] statusBarFrame].size.height
+#define kPYNavigationBarHeight              self.navigationController.navigationBar.frame.size.height
+#define kPYSafeAreaTopHegiht                (kPYNavigationBarHeight + kPYStatusBarHeight)
+#define kPYSafeAreaBottomHeight             (kPY_IS_iPhoneX ? 34.f : 0.f)
+
 @interface ShowByWKWebViewController ()<WKNavigationDelegate,WKUIDelegate>
 
 @property (nonatomic, strong) PYCWebViewHelper *pycWebViewHelper;
@@ -25,20 +30,21 @@
     self.automaticallyAdjustsScrollViewInsets = NO;
     [self customBackItem];
     
-    self.baseWebView = [[WKWebView alloc] initWithFrame:CGRectMake(0, 64,[UIScreen mainScreen].bounds.size.width ,[UIScreen mainScreen].bounds.size.height - 64)];
+    self.baseWebView = [[WKWebView alloc] initWithFrame:CGRectMake(0, kPYSafeAreaTopHegiht,[UIScreen mainScreen].bounds.size.width ,[UIScreen mainScreen].bounds.size.height - kPYSafeAreaTopHegiht)];
     self.baseWebView.navigationDelegate = self;
     self.baseWebView.UIDelegate = self;
     [self.view addSubview:self.baseWebView];
     
-    NSURL *url = [[NSURL alloc] initWithString:@"https://m1.tianxiaxinyong.com/cooperation/crp-webview/index.html?channel=10000"];
+#warning 需要替换为真正的URL
+    NSURL *url = [[NSURL alloc] initWithString:@"** 使用鹏元提供的渠道url **"];
     NSURLRequest *request = [[NSURLRequest alloc] initWithURL:url];
     [self.baseWebView loadRequest:request];
     
     //无广告的初始化方法
     //self.pycWebViewHelper = [[PYCWebViewHelper alloc] init];
     
-    //有广告的初始化方法，URL为图片链接，Block为用户点击广告时的回调方法
-    self.pycWebViewHelper = [[PYCWebViewHelper alloc] initWithUrl:@"https://www.pycredit.cn/static/images/index/company-intro-caption.d56e32d9.png" webViewHelperBlock:^(NSString *urlString) {
+    //有广告的初始化方法，URL为图片链接（建议使用https协议链接应对苹果的ATS政策），Block为用户点击广告时的回调方法
+    self.pycWebViewHelper = [[PYCWebViewHelper alloc] initWithUrl:@"** 广告图片链接，建议使用https协议链接应对苹果的ATS政策 **" webViewHelperBlock:^(NSString *urlString) {
         //可以自由跳转WebView或App内部模块
         
     }];

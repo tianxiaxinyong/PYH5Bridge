@@ -6,11 +6,10 @@
 //  Copyright (c) 2015年 jinzelu. All rights reserved.
 //
 
-#import "PhotoView.h"
-//#import "UIImageView+WebCache.h"
+#import "PYPhotoView.h"
 #import "MBProgressHUD.h"
 
-@interface PhotoView ()<UIScrollViewDelegate>
+@interface PYPhotoView ()<UIScrollViewDelegate>
 {
     UIScrollView *_scrollView;
     MBProgressHUD *hud;
@@ -18,7 +17,7 @@
 
 @end
 
-@implementation PhotoView
+@implementation PYPhotoView
 
 
 -(id)initWithFrame:(CGRect)frame withPhotoImage:(UIImage *)image{

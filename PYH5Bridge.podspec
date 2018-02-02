@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'PYH5Bridge'
-  s.version          = '0.2.0'
+  s.version          = '1.1.2'
   s.summary          = 'PYH5Bridge.'
 
 # This description is used to generate tags and improve search results.
@@ -31,9 +31,11 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '8.0'
 
   s.source_files = 'PYH5Bridge/Classes/**/*'
+
+  s.resources = "PYH5Bridge/Assets/*.bundle"
   
   # s.resource_bundles = {
-  #   'PYH5Bridge' => ['PYH5Bridge/Assets/*.png']
+  #  'PYH5Bridge' => ['PYH5Bridge/Assets/*.png']
   # }
 
   # s.public_header_files = 'Pod/Classes/**/*.h'
@@ -42,6 +44,4 @@ Pod::Spec.new do |s|
   s.dependency 'AFNetworking', '3.1.0'
   s.dependency 'MBProgressHUD', '0.9.1'
   s.dependency 'Qiniu', '~> 7.2'
-  s.dependency 'HappyDNS'
-  s.dependency 'IMYWebView'
 end

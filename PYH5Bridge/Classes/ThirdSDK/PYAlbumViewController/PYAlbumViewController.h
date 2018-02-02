@@ -8,7 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
-@interface JZAlbumViewController : UIViewController
+
+@interface PYAlbumViewController : UIViewController
 
 /**
  *  接收图片数组，数组类型可以是url数组，image数组

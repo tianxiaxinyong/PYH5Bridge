@@ -35,6 +35,8 @@
 @end
 
 @interface PYCH5IOImageHelper : NSObject
+//拍照类型（正，反，手持）
+@property (nonatomic , strong)  NSNumber   *imageType;
 
 - (instancetype) initWithDelegate:(id <PYCH5IOImageHelperProtocol>) delegate;
 

@@ -23,9 +23,9 @@ typedef void(^PYCWebViewHelperBlock)(NSString *urlString);
 /**
  用于用户自定义处理与JS的交互接口
  
- @param message <#message description#>
+  @param message 回调参数
  */
-- (void)excuteMethodWithMethodDic:(id)message;
+- (void)excuteMethodWithMethodDic:(NSDictionary *)message;
 @end
 
 
@@ -48,12 +48,14 @@ typedef void(^PYCWebViewHelperBlock)(NSString *urlString);
  @return 实例
  */
 - (instancetype)initWithUrl:(NSString *)urlString webViewHelperBlock:(PYCWebViewHelperBlock)webViewHelperBlock;
+
 /**
  增加监听JS事件
  
- @param webView webView description
+  @param webView UIWebView或WKWebView
+  @param scriptMessageHandler 视图控制器
  */
-- (void)addScriptMessageHandlerToWebView:(id)webView webViewDelegate:(id)scriptMessageHandler;
+- (void)addScriptMessageHandlerToWebView:(UIView *)webView webViewDelegate:(UIViewController *)scriptMessageHandler;
 
 /**
  删除事件，未删除会导致内存泄露
@@ -62,17 +64,27 @@ typedef void(^PYCWebViewHelperBlock)(NSString *urlString);
 
 
 /**
- UIWebViewDelegate的方法，UIWebView集成时要调用此方法
+ UIWebViewDelegate的方法，UIWebView集成时要调用此方法 （*********用于与服务器通信）
  */
 - (BOOL)pycWebView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType;
+
 /**
-  WKNavigationDelegate的方法，WKWebView集成时要调用此方法
+  WKNavigationDelegate的方法，WKWebView集成时要调用此方法（*********用于与服务器通信）
  */
 -(void)pycWebView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler;
 
 /**
- 会拦截到window.open()事件.只需要我们在方法内进行处理
+ WKWebView会拦截到window.open()事件.只需要我们在方法内进行处理(*********)
 
  */
 - (WKWebView *)pyWebView:(WKWebView *)webView createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration forNavigationAction:(WKNavigationAction *)navigationAction windowFeatures:(WKWindowFeatures *)windowFeatures;
+
+
+/**
+ 用于在WKWebView当前页面被系统结束后重载当前页面（非必须）
+
+ @param webView WKWebView实例对象
+ */
+- (void)pyWebViewWebContentProcessDidTerminate:(WKWebView *)webView;
+
 @end

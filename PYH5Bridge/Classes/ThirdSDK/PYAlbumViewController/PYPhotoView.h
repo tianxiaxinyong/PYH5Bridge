@@ -7,15 +7,17 @@
 //
 
 #import <UIKit/UIKit.h>
+
 //1.
-@protocol PhotoViewDelegate <NSObject>
+@protocol PYPhotoViewDelegate <NSObject>
 
 //点击图片时，隐藏图片浏览器
 -(void)TapHiddenPhotoView;
 
 @end
 
-@interface PhotoView : UIView
+
+@interface PYPhotoView : UIView
 /**
  *  添加的图片
  */
@@ -24,7 +26,7 @@
 /**
  *  代理
  */
-@property(nonatomic, assign) id<PhotoViewDelegate> delegate;
+@property(nonatomic, assign) id<PYPhotoViewDelegate> delegate;
 
 //-(id)initWithFrame:(CGRect)frame withPhotoUrl:(NSString *)photoUrl;
 

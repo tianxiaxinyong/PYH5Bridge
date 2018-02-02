@@ -21,16 +21,27 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="AvG-3s-593">
-                                <rect key="frame" x="87" y="253" width="190" height="30"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="H5页面测试"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="AvG-3s-593">
+                                <rect key="frame" x="87" y="253" width="200" height="40"/>
+                                <color key="backgroundColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="200" id="fPz-xh-RfF"/>
+                                    <constraint firstAttribute="height" constant="40" id="h5j-ke-Blj"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <state key="normal" title="H5页面测试">
+                                    <color key="titleColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                </state>
                                 <connections>
                                     <action selector="H5TouchUpInside:" destination="whP-gf-Uak" eventType="touchUpInside" id="d59-xp-pQD"/>
                                 </connections>
                             </button>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="AvG-3s-593" firstAttribute="top" secondItem="uEw-UM-LJ8" secondAttribute="bottom" constant="189" id="TMO-ob-X4o"/>
+                            <constraint firstItem="AvG-3s-593" firstAttribute="centerX" secondItem="TpU-gO-2f1" secondAttribute="centerX" id="dqr-R0-Jyl"/>
+                        </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="PYH5BridgeDemo" id="eYJ-KU-QED"/>
                 </viewController>

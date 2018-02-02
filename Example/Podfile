@@ -1,8 +1,9 @@
 platform :ios, '8.0'
 use_frameworks!
+inhibit_all_warnings!
 
 target 'PYH5Bridge_Example' do
-  pod 'PYH5Bridge'
+    pod 'PYH5Bridge', :path => '../'
   
   target 'PYH5Bridge_Tests' do
     inherit! :search_paths

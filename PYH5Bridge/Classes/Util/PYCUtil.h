@@ -17,6 +17,9 @@
 #define SCREEN_WIDTH ([UIScreen mainScreen].bounds.size.width)
 #define SCREEN_HEIGHT ([UIScreen mainScreen].bounds.size.height)
 
+#define TOP_BAR_HEIGHT 40.f
+#define BOTTOM_BAR_HEIGHT (SCREEN_HEIGHT - ((SCREEN_WIDTH / 3 ) * 4 + TOP_BAR_HEIGHT))
+
 
 @interface PYCUtil : NSObject
 

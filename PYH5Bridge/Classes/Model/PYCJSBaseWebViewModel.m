@@ -72,7 +72,10 @@ static NSString *const kPYCREDIT_BRIDGE = @"PYCREDIT_BRIDGE";
                     NSString *jsvalueStr = [jsvalue toString];
                     NSDictionary *jsonObject = [NSJSONSerialization JSONObjectWithData:[jsvalueStr dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];
                     if(_delegate && [_delegate respondsToSelector:@selector(excuteMethodWithMethodDic:)]){
-                        [_delegate excuteMethodWithMethodDic:jsonObject];
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            [_delegate excuteMethodWithMethodDic:jsonObject];
+                        });
+                        
                     }
                 }
             };
@@ -85,16 +88,7 @@ static NSString *const kPYCREDIT_BRIDGE = @"PYCREDIT_BRIDGE";
 {
     for (NSString *actionName in _actionNameArr)
     {
-        //拍照 相册 方法默认注册实现，不参与回调。
-        if ([actionName isEqualToString:kFuncTakePicture]) {
-            self.context[kPYCREDIT_BRIDGE][actionName] = nil;
-        } else if ([actionName isEqualToString:kFuncSelectPic]) {
-            self.context[kPYCREDIT_BRIDGE][actionName] = nil;
-        } else if ([actionName isEqualToString:kFuncLocation]) {
-            self.context[kPYCREDIT_BRIDGE][actionName] = nil;
-        } else {
-            self.context[kPYCREDIT_BRIDGE][actionName] = nil;
-        }
+       self.context[kPYCREDIT_BRIDGE][actionName] = nil;
     }
     
     

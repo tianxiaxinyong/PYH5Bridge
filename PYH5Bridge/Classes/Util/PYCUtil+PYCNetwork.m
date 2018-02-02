@@ -13,6 +13,7 @@
 #import "QNUploadManager.h"
 #import "QNResponseInfo.h"
 
+
 static NSString *kTokenString               = @"token";
 static NSString *kKeyString                 = @"key";
 static NSString *kFileString                = @"file";

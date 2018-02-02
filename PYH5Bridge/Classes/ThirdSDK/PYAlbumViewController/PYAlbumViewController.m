@@ -6,14 +6,14 @@
 //  Copyright (c) 2015年 jinzelu. All rights reserved.
 //
 
-#import "JZAlbumViewController.h"
+#import "PYAlbumViewController.h"
 #import "MBProgressHUD.h"
-#import "PhotoView.h"
+#import "PYPhotoView.h"
 #import "PYCUtil.h"
 
 #define  jz_tapbarHeight 20.0f
 
-@interface JZAlbumViewController ()<UIScrollViewDelegate,PhotoViewDelegate>
+@interface PYAlbumViewController ()<UIScrollViewDelegate, PYPhotoViewDelegate>
 {
     CGFloat lastScale;
     MBProgressHUD *HUD;
@@ -22,7 +22,7 @@
 
 @end
 
-@implementation JZAlbumViewController
+@implementation PYAlbumViewController
 
 -(id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil{
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
@@ -100,17 +100,17 @@
     }
     
     id currentPhotoView = [_subViewList objectAtIndex:index];
-    if (![currentPhotoView isKindOfClass:[PhotoView class]]) {
+    if (![currentPhotoView isKindOfClass:[PYPhotoView class]]) {
         //url数组
         CGRect frame = CGRectMake(index*_scrollView.frame.size.width, 0, self.view.frame.size.width, self.scrollView.frame.size.height);
-        PhotoView *photoV = [[PhotoView alloc] initWithFrame:frame withPhotoImage:[self.imgArr objectAtIndex:index]];
+        PYPhotoView *photoV = [[PYPhotoView alloc] initWithFrame:frame withPhotoImage:[self.imgArr objectAtIndex:index]];
         photoV.delegate = self;
         [self.scrollView insertSubview:photoV atIndex:0];
         [_subViewList replaceObjectAtIndex:index withObject:photoV];
     }else{
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored"-Wunused-variable"
-        PhotoView *photoV = (PhotoView *)currentPhotoView;
+        PYPhotoView *photoV = (PYPhotoView *)currentPhotoView;
 #pragma clang diagnostic pop
     }
     

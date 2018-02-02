@@ -27,8 +27,21 @@
 /** 判断App是否有访问照片权限 */
 + (BOOL)hasPhotosRights;
 
-/** 判断App是否有访问相机权限 */
-+ (BOOL)hasCameraRights;
+
+/**
+ 判断App是否有访问相机权限
+
+ @param isFirstSetting 是否是第一次进入设置（可为空）
+ @return 是否有权限
+ */
++ (BOOL)hasCameraRights:(BOOL *)isFirstSetting;
+
+/**
+ 麦克风权限
+ @param isFirstSetting 是否是第一次进入设置（可为空）
+ @return 是否有权限
+ */
++ (BOOL)hasAudioRights:(BOOL *)isFirstSetting;
 
 #pragma mark -- devieceInfo
 /** 屏幕宽 */

@@ -14,12 +14,16 @@
 #import <AssetsLibrary/AssetsLibrary.h>
 #import "PYCUtil+PYCInvocatSystemOperate.h"
 #import "UIImage+PYCCreate.h"
+#import "PYCameraLayerView.h"
 
-@interface PYCImagePickerController () <UINavigationControllerDelegate>
+
+@interface PYCImagePickerController () <UINavigationControllerDelegate,PYCameraLayerViewDelegate>
+
 
 @property (nonatomic, strong) UIImagePickerController *imagePickerController;
 @property (nonatomic, weak) UIViewController *parentViewContrller;
 @property (nonatomic, assign) NSInteger maxChooseImageNumble;
+@property (nonatomic, strong) PYCameraLayerView *layerView;
 
 @end
 
@@ -44,6 +48,7 @@ static PYCImagePickerController * static_ZwImagePickerController = nil;
         self.imagePickerController = [[UIImagePickerController alloc] init];
         self.imagePickerController.delegate = self;
         self.imagePickerController.allowsEditing = NO;
+        
         
     }
     
@@ -79,9 +84,9 @@ static PYCImagePickerController * static_ZwImagePickerController = nil;
                 break;
             case PYCControlTypeTakePhoto:
             {
-                if (![PYCUtil hasCameraRights]) {
+                if (![PYCUtil hasCameraRights:nil]) {
                     if ([[UIDevice currentDevice].systemVersion floatValue] >= 8.0) {
-                        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:nil message:@"请在设备的“设置”选项中，允许应用访问您的相机" delegate:self cancelButtonTitle:@"确定" otherButtonTitles:@"去设置", nil];
+                        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:nil message:@"请在设备的“设置”选项中，允许应用访问您的相机" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"去设置", nil];
                         alert.tag = 1000;
                         [alert show];
                     }
@@ -115,12 +120,13 @@ static PYCImagePickerController * static_ZwImagePickerController = nil;
 - (void)showWithControlType:(PYCControlType)type
           maxChooseImageNum:(NSInteger)num
        parentViewController:(UIViewController *)controller
+             pickerDelegate:(NSObject *)pickerDelegate
            cameraDeviceType:(UIImagePickerControllerCameraDevice)cameraDeviceType//摄像头前或后
 {
     
     [ALAssetsLibrary disableSharedPhotoStreamsSupport];
     self.parentViewContrller = controller;
-    self.pickerDelegate = (id <PYCImagePickerControllerDelegate>)controller;
+    self.pickerDelegate = (id <PYCImagePickerControllerDelegate>)pickerDelegate;
     self.maxChooseImageNumble = num;
     
     self.imagePickerController = [[UIImagePickerController alloc] init];
@@ -141,9 +147,9 @@ static PYCImagePickerController * static_ZwImagePickerController = nil;
                 break;
             case PYCControlTypeTakePhoto:
             {
-                if (![PYCUtil hasCameraRights]) {
+                if (![PYCUtil hasCameraRights:nil]) {
                     if ([[UIDevice currentDevice].systemVersion floatValue] >= 8.0) {
-                        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:nil message:@"请在设备的“设置”选项中，允许应用访问您的相机" delegate:self cancelButtonTitle:@"确定" otherButtonTitles:@"去设置", nil];
+                        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:nil message:@"请在设备的“设置”选项中，允许应用访问您的相机" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"去设置", nil];
                         alert.tag = 1000;
                         [alert show];
                     }
@@ -174,10 +180,29 @@ static PYCImagePickerController * static_ZwImagePickerController = nil;
     self.imagePickerController.sourceType = sourceType;
     if (sourceType == UIImagePickerControllerSourceTypeCamera) {
         self.imagePickerController.cameraDevice = cameraDeviceType;
+        self.imagePickerController.showsCameraControls = NO;
+        CGAffineTransform translate = CGAffineTransformMakeTranslation(0.0, TOP_BAR_HEIGHT);
+        self.imagePickerController.cameraViewTransform = translate;
+        
+        CGAffineTransform scale = CGAffineTransformScale(translate, 4/3, 4/3);
+        self.imagePickerController.cameraViewTransform = scale;
+        
+        
+        
+        //取拍照类型（正，反，手持）
+        CameraLayerType layerType = CameraLayerType_Flag;
+        if (_pickerDelegate && [_pickerDelegate respondsToSelector:@selector(layerType)])
+        {
+            layerType = [_pickerDelegate layerType];
+        }
+        
+        self.layerView = [[PYCameraLayerView alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT) layerType:layerType];//有三张不同的照片，分三种不同的情况赋值 hu.w
+        self.layerView.delegate = self;
+        self.imagePickerController.cameraOverlayView = self.layerView;
+        
     }
     [self show];
 }
-
 
 - (void)show
 {
@@ -215,6 +240,33 @@ static PYCImagePickerController * static_ZwImagePickerController = nil;
     [self hide];
 }
 
+#pragma mark --- PYCameraLayerViewDelegate
+- (void) takePhoto
+{
+    [self.imagePickerController takePicture];
+}
+- (void) lightAction:(BOOL)isOpen
+{
+    if (!isOpen) {
+        if (self.imagePickerController.cameraDevice != UIImagePickerControllerCameraDeviceFront) {
+            self.imagePickerController.cameraFlashMode = UIImagePickerControllerCameraFlashModeOn;
+        }
+    }else {
+        self.imagePickerController.cameraFlashMode = UIImagePickerControllerCameraFlashModeOff;
+    }
+}
+- (void) changeCameraDirection
+{
+    if (self.imagePickerController.cameraDevice ==UIImagePickerControllerCameraDeviceRear ) {
+        self.imagePickerController.cameraDevice = UIImagePickerControllerCameraDeviceFront;
+    }else {
+        self.imagePickerController.cameraDevice = UIImagePickerControllerCameraDeviceRear;
+    }
+}
+- (void) exitCamera
+{
+    [self imagePickerControllerDidCancel:self.imagePickerController];
+}
 
 #pragma mark UIAlertViewDelegate
 
