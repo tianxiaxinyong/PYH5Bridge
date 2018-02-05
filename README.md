@@ -33,7 +33,7 @@ PYH5Bridge提供源码手动集成及CocoaPods集成这2种集成方式，可任
 * `CoreMedia.framework`  
 
 
-3）`PYH5Bridge`还依赖如下第三方组件，请手动添加到项目中(点击链接可直达github处下载)：  
+3）`PYH5Bridge`还依赖如下第三方组件，请手动添加到项目中，若项目中已存在，则不用再次添加(点击链接可直达github处下载)：  
 
 * [`AFNetworking`](https://github.com/AFNetworking/AFNetworking)  
 * [`MBProgressHUD`](https://github.com/jdg/MBProgressHUD)  

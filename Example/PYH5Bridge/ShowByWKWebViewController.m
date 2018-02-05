@@ -119,7 +119,7 @@
 - (void)viewWillLayoutSubviews
 {
     [super viewWillLayoutSubviews];
-    self.baseWebView.frame = CGRectMake(0, 64,[UIScreen mainScreen].bounds.size.width ,[UIScreen mainScreen].bounds.size.height - 64);
+    self.baseWebView.frame = CGRectMake(0, kPYSafeAreaTopHegiht,[UIScreen mainScreen].bounds.size.width ,[UIScreen mainScreen].bounds.size.height - kPYSafeAreaTopHegiht);
 }
 
 - (BOOL)shouldAutorotate
