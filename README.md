@@ -7,7 +7,7 @@
 
 
 ##### 集成说明
-PYH5Bridge提供源码手动集成及CocoaPods集成这2种集成方式，可任意选择一种进行集成。
+PYH5Bridge提供源码手动集成及CocoaPods集成这2种集成方式，可任意选择一种方式进行集成。
 ###### CocoaPods集成
 在工程的`Podfile`文件中添加：
 
@@ -54,7 +54,7 @@ PYH5Bridge提供源码手动集成及CocoaPods集成这2种集成方式，可任
 
 * 微信支付支持：在info.plist中添加"LSApplicationQueriesSchemes"项，`Type`为Array，增加一个子项, `Type`为String，`Value`为"weixin"。  
 * 支付宝支持：在info.plist中添加"LSApplicationQueriesSchemes"项，`Type`为Array，增加一个子项, `Type`为String，`Value`为"alipay"。
-* 微信支付完成回调：由天下信用后台为用户生成一个"`URL Scheme`"标识, 在项目工程里面的info选项的"URL Type"下添加一项，"`URL Scheme`"为天下信用后台生成的标识，添加以后在手机上运行一次，然后可以在手机`Safari`浏览器里面输入刚添加的"URL Scheme://"，验证是否能跳转到自己的应用。
+* 微信支付完成回调：由天下信用后台为用户生成一个"`URL Scheme`"标识（下面以"`PYTXXY`"来示范）, 在项目工程里面的`info`选项卡下`URL Type`分组添加一项，`URL Schemes`的值为"`PYTXXY`"。添加以后在手机上运行一次项目，然后在手机`Safari`浏览器里面输入刚添加的"`PYTXXY://`"，验证是否能跳转到自己的应用。
 
 
 

@@ -654,7 +654,11 @@ typedef void(^successOpenPaymentApp)(void);
 
 - (void)actionGetAppInfo:(NSDictionary *)dict {
     NSString *jsString = nil;
-    jsString = [NSString stringWithFormat:@"%@({\"version\":\"%@\"})", self.resultDataDictionary[kPYJSFunc_GetAppInfo].successFunName, kSdkVersion];
+    jsString = [NSString stringWithFormat:@"%@({\"version\":\"%@\", \"manufacturer\":\"Apple\", \"model\":\"%@\", \"product\":\"%@\", \"OSVersion\":\"%@\", \"deviceInfo\":\"%@\"})", self.resultDataDictionary[kPYJSFunc_GetAppInfo].successFunName, kSdkVersion,
+                 [PYCUtil iphoneType],
+                 [[UIDevice currentDevice] systemName],
+                 [[UIDevice currentDevice] systemVersion],
+                 [NSString stringWithFormat:@"%@_%@",@"Apple",[PYCUtil iphoneType]]];
     
     [self executeJSFunctionWithString:jsString];
 }

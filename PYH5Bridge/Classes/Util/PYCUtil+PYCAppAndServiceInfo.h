@@ -49,4 +49,11 @@
 
 /** 屏幕宽 */
 + (CGFloat)screenHeight;
+
+/**
+ 手机类型
+ 
+ @return 手机类型
+ */
++ (NSString *)iphoneType;
 @end
