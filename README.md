@@ -35,10 +35,10 @@ PYH5Bridge提供源码手动集成及CocoaPods集成这2种集成方式，可任
 
 3）`PYH5Bridge`还依赖如下第三方组件，请手动添加到项目中，若项目中已存在，则不用再次添加(点击链接可直达github处下载)：  
 
-* [`AFNetworking`](https://github.com/AFNetworking/AFNetworking)  
-* [`MBProgressHUD`](https://github.com/jdg/MBProgressHUD)  
-* [`Qiniu`](https://github.com/qiniu/objc-sdk)  
-* [`HappyDNS`](https://github.com/qiniu/happy-dns-objc)  
+* [`AFNetworking`(3.1.0)](https://github.com/AFNetworking/AFNetworking)  
+* [`MBProgressHUD`(0.9.1)](https://github.com/jdg/MBProgressHUD)  
+* [`Qiniu`(7.2.x)](https://github.com/qiniu/objc-sdk)  
+* [`HappyDNS`(0.3.x)](https://github.com/qiniu/happy-dns-objc)  
 
   
 
