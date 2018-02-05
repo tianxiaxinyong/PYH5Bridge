@@ -41,7 +41,7 @@ Pod::Spec.new do |s|
   # s.public_header_files = 'Pod/Classes/**/*.h'
   s.frameworks = 'AVFoundation', 'AssetsLibrary', 'JavaScriptCore', 'CoreMedia', 'SystemConfiguration', 'MobileCoreServices', 'Photos'
   s.libraries  = 'z', 'resolv.9'
-  s.dependency 'AFNetworking', '3.1.0'
-  s.dependency 'MBProgressHUD', '0.9.1'
+  s.dependency 'AFNetworking', '~> 3.0'
+  s.dependency 'MBProgressHUD', '~> 1.1.0'
   s.dependency 'Qiniu', '~> 7.2'
 end
