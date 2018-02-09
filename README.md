@@ -43,14 +43,14 @@ PYH5Bridge提供源码手动集成及CocoaPods集成这2种集成方式，可任
   
 
 #### 2.3 额外设置
-**权限申请描述**  
+##### 2.3.1 权限申请描述 
 
 * 在info.plist中添加"Privacy - Camera Usage Description"项，`Type`为String，`Value`为申请相机权限的理由描述文字。
 * 在info.plist中添加"Privacy - Microphone Usage Description"项，`Type`为String，`Value`为申请麦克风权限的理由描述文字。
 * 在info.plist中添加"Privacy - Location When In Use Usage Description"项，`Type`为String，`Value`为申请使用应用时定位权限的理由描述文字。  
 
 
-**支付方式设置**
+##### 2.3.2 支付方式设置
 
 * 微信支付支持：在info.plist中添加"LSApplicationQueriesSchemes"项，`Type`为Array，增加一个子项, `Type`为String，`Value`为"weixin"。  
 * 支付宝支持：在info.plist中添加"LSApplicationQueriesSchemes"项，`Type`为Array，增加一个子项, `Type`为String，`Value`为"alipay"。
