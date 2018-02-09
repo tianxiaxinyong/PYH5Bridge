@@ -1,14 +1,14 @@
 ##  PYH5Bridge集成说明
 
 
-##### 1. 运行环境
+### 1. 运行环境
 支持iOS 8.0及8.0以上的系统。   
 存在问题：在iOS 8.x系统上，退出当前H5页面后，WKWebView与UIWebView无法保存会话，再次进入时需重新登录，iOS 9.0及9.0以上系统无此问题。 
 
 
-##### 2. 集成说明
+### 2. 集成说明
 PYH5Bridge提供源码手动集成及CocoaPods集成这2种集成方式，可任意选择一种方式进行集成。
-###### 2.1 CocoaPods集成
+#### 2.1 CocoaPods集成
 在工程的`Podfile`文件中添加：
 
 ```objc
@@ -17,7 +17,7 @@ PYH5Bridge提供源码手动集成及CocoaPods集成这2种集成方式，可任
 保存并执行`pod install`命令，即可将PYH5Bridge集成到已有工程中。  
 若要更新版本，执行`pod update`命令即可将`PYH5Bridge`更新到最新版本。
 
-###### 2.2 手动集成
+#### 2.2 手动集成
 1）下载并解压`PYH5Bridge`源码，将`PYH5Bridge/Classes`及`PYH5Bridge/Assets`目录下的所有文件先复制到项目路径下，然后在Xcode中通过"`Add Files to project`"的方式添加。  
 
 2）在项目"`Build Phases`"的"`Link Binary With Libraries`"中添加如下框架：  
@@ -42,7 +42,7 @@ PYH5Bridge提供源码手动集成及CocoaPods集成这2种集成方式，可任
 
   
 
-###### 2.3 额外设置
+#### 2.3 额外设置
 **权限申请描述**  
 
 * 在info.plist中添加"Privacy - Camera Usage Description"项，`Type`为String，`Value`为申请相机权限的理由描述文字。
@@ -58,7 +58,7 @@ PYH5Bridge提供源码手动集成及CocoaPods集成这2种集成方式，可任
 
 
 
-##### 3. 使用说明  
+### 3. 使用说明  
 
 PYH5Bridge提供了WebView的PYCWebViewHelper类，用于设置WebView的JS Bridge。
       
@@ -120,10 +120,10 @@ PYH5Bridge提供了WebView的PYCWebViewHelper类，用于设置WebView的JS Brid
 }
 ```
 
-##### 4. 其他功能
+### 4. 其他功能
 这一节中描述了一些增强用户体验的设置或额外功能，用户可根据项目实际情况考虑是否采用。  
 
-###### 4.1 处理H5页面的后退事件  
+#### 4.1 处理H5页面的后退事件  
 在用户访问H5页面时，通过导航栏的返回按钮只能返回到上一界面，不能回退到H5前一页面，因此需要通过处理返回按钮点击事件来实现H5页面回退。 
   
   
@@ -147,7 +147,7 @@ PYH5Bridge提供了WebView的PYCWebViewHelper类，用于设置WebView的JS Brid
 }
 ```
   
-###### 4.2 添加广告
+#### 4.2 添加广告
 可以在H5页面底部添加一个广告，用于展示指定图片（尺寸为1080 * 286），用户点击图片广告后将会回调App预先设置的方法进行处理。  
 由于H5页面使用了https协议，因浏览器安全限制，广告图片的链接必须使用https协议，否则图片无法加载和展示。点击广告后指向的页面链接不受限制，可以是http或https协议的。   
 > 使用此功能时，需提前与天下信用沟通，否则可能无法生效。  
@@ -179,7 +179,7 @@ PYH5Bridge提供了WebView的PYCWebViewHelper类，用于设置WebView的JS Brid
 }  
 ```
 
-###### 4.3 竖屏展示H5页面
+#### 4.3 竖屏展示H5页面
 为了更好的用户使用体验，建议在竖屏状态下展示H5页面，在`PYH5Bridge_Example`中有相应实现代码供参考。  
 部分代码展示：  
 
@@ -196,7 +196,7 @@ PYH5Bridge提供了WebView的PYCWebViewHelper类，用于设置WebView的JS Brid
 }  
 ```
 
-###### 4.4 添加关闭按钮
+#### 4.4 添加关闭按钮
 用户在访问H5页面时，若进入的层级较深，只能点击多次"返回"按钮来退出当前ViewController，无法一次性关闭当前界面。目前比较通用的方法是添加关闭按钮来直接关闭当前界面。  
 
 在`PYH5Bridge_Example`中有相应实现代码供参考,部分代码如下：  
