@@ -1,5 +1,5 @@
 ##  PYH5Bridge集成说明
-
+>此版本不再维护，最新版本请移步[`PYH5Bridge-iOS`](https://github.com/pytxxy/PYH5Bridge-iOS)
 
 ### 1. 运行环境
 支持iOS 8.0及8.0以上的系统。   
